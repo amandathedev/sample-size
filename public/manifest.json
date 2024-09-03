@@ -1,9 +1,9 @@
 {
-  "manifest_version": 2,
-  "name": "A/B Sample Size",
+  "manifest_version": 3,
+  "name": "Sample Size",
   "version": "1.0",
   "description": "Sample Size Calculator for A/B Testing",
-  "browser_action": {
+  "action": {
     "default_popup": "index.html",
     "default_icon": {
       "16": "icons/icon16.png",
@@ -15,6 +15,5 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  },
-  "permissions": []
+  }
 }

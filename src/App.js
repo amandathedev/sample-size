@@ -39,7 +39,7 @@ const App = () => {
   };
 
   return (
-    <Box className="App" sx={{ p: 3, width: '260px' }}>
+    <Box className="App" sx={{ p: 3, width: '280px' }}>
       <Box sx={{ textAlign: 'center', mb: 2 }}>
         <Typography variant="subtitle1">Sample Size</Typography>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
@@ -68,39 +68,43 @@ const App = () => {
         inputProps={{ max: 9999, min: 0.01 }}
       />
 
-      <RadioGroup value={isAbsolute ? 'Absolute' : 'Relative'} onChange={handleRadioChange} row>
+      <RadioGroup value={isAbsolute ? 'Absolute' : 'Relative'} onChange={handleRadioChange} row sx={{ justifyContent: 'center', mb: 2 }}>
         <FormControlLabel value="Absolute" control={<Radio />} label="Absolute" />
         <FormControlLabel value="Relative" control={<Radio />} label="Relative" />
       </RadioGroup>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', mt: 3 }}>
-        <Typography sx={{ flex: 1, textAlign: 'center' }}>Statistical power 1−β:</Typography>
-        <Slider
-          value={power}
-          min={50}
-          max={99}
-          step={1}
-          onChange={handleSliderChange(setPower)}
-          valueLabelDisplay="auto"
-          aria-labelledby="power-slider"
-          sx={{ flex: 2 }}
-        />
-        <Typography sx={{ flex: 1, textAlign: 'right' }}>{power}%</Typography>
+      <Box sx={{ mt: 3 }}>
+        <Typography sx={{ mb: 1 }}>Statistical power 1−β:</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Slider
+            value={power}
+            min={50}
+            max={99}
+            step={1}
+            onChange={handleSliderChange(setPower)}
+            valueLabelDisplay="auto"
+            aria-labelledby="power-slider"
+            sx={{ flex: 1 }}
+          />
+          <Typography sx={{ ml: 2, width: '40px', textAlign: 'right' }}>{power}%</Typography>
+        </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', mt: 3 }}>
-        <Typography sx={{ flex: 1, textAlign: 'center' }}>Significance level α:</Typography>
-        <Slider
-          value={significanceLevel}
-          min={1}
-          max={10}
-          step={0.5}
-          onChange={handleSliderChange(setSignificanceLevel)}
-          valueLabelDisplay="auto"
-          aria-labelledby="significance-slider"
-          sx={{ flex: 2 }}
-        />
-        <Typography sx={{ flex: 1, textAlign: 'right' }}>{significanceLevel}%</Typography>
+      <Box sx={{ mt: 3 }}>
+        <Typography sx={{ mb: 1 }}>Significance level α:</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Slider
+            value={significanceLevel}
+            min={1}
+            max={10}
+            step={0.5}
+            onChange={handleSliderChange(setSignificanceLevel)}
+            valueLabelDisplay="auto"
+            aria-labelledby="significance-slider"
+            sx={{ flex: 1 }}
+          />
+          <Typography sx={{ ml: 2, width: '40px', textAlign: 'right' }}>{significanceLevel}%</Typography>
+        </Box>
       </Box>
     </Box>
   );
