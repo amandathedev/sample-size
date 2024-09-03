@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Slider, Typography, Box, RadioGroup, FormControlLabel, Radio, TextField } from '@mui/material';
+import { Slider, Typography, Box, RadioGroup, FormControlLabel, Radio, TextField, Link } from '@mui/material';
 import { calculateSampleSize } from './mathUtils';
 
 const App = () => {
   const [baselineRate, setBaselineRate] = useState(20);
   const [minDetectableEffect, setMinDetectableEffect] = useState(5);
-  const [isAbsolute, setIsAbsolute] = useState(true); // State variable for radio buttons
+  const [isAbsolute, setIsAbsolute] = useState(true);
   const [sampleSize, setSampleSize] = useState('-');
   const [power, setPower] = useState(75);
   const [significanceLevel, setSignificanceLevel] = useState(5);
@@ -105,6 +105,12 @@ const App = () => {
           />
           <Typography sx={{ ml: 2, width: '40px', textAlign: 'right' }}>{significanceLevel}%</Typography>
         </Box>
+      </Box>
+
+      <Box sx={{ textAlign: 'center', mt: 4 }}>
+        <Link href="https://www.evanmiller.org/ab-testing/" target="_blank" rel="noopener">
+          Explore more tools here
+        </Link>
       </Box>
     </Box>
   );

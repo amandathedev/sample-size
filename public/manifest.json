@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Sample Size",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Sample Size Calculator for A/B Testing",
   "action": {
     "default_popup": "index.html",
