@@ -33,8 +33,8 @@ const App = () => {
   };
 
   return (
-    <Box className="App" sx={{ p: 3 }}>
-      <Typography gutterBottom>Sample size: {sampleSize} per variation</Typography>
+    <Box className="App" sx={{ p: 1 }}>
+      <Typography variant="h6" gutterBottom sx={{ fontSize: '14px', fontWeight: 'bold' }}>Sample size: {sampleSize} per variation</Typography>
 
       <TextField
         label="Baseline conversion rate (%)"
@@ -42,8 +42,9 @@ const App = () => {
         value={baselineRate}
         onChange={handleInputChange(setBaselineRate)}
         fullWidth
-        margin="normal"
+        margin="dense"
         inputProps={{ max: 100 }}
+        sx={{ mb: 1 }}
       />
 
       <TextField
@@ -52,17 +53,18 @@ const App = () => {
         value={minDetectableEffect}
         onChange={handleInputChange(setMinDetectableEffect)}
         fullWidth
-        margin="normal"
+        margin="dense"
         inputProps={{ max: 100 }}
+        sx={{ mb: 1 }}
       />
 
-      <RadioGroup value={option} onChange={handleOptionChange} row>
-        <FormControlLabel value="Absolute" control={<Radio />} label="Absolute" />
-        <FormControlLabel value="Relative" control={<Radio />} label="Relative" />
+      <RadioGroup value={option} onChange={handleOptionChange} row sx={{ justifyContent: 'center', mb: 1 }}>
+        <FormControlLabel value="Absolute" control={<Radio size="small" />} label={<Typography sx={{ fontSize: '12px' }}>Absolute</Typography>} />
+        <FormControlLabel value="Relative" control={<Radio size="small" />} label={<Typography sx={{ fontSize: '12px' }}>Relative</Typography>} />
       </RadioGroup>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', mt: 3 }}>
-        <Typography sx={{ flex: 1, textAlign: 'center' }}>Statistical power 1−β:</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+        <Typography sx={{ flex: 1, textAlign: 'center', fontSize: '12px' }}>Statistical power 1−β:</Typography>
         <Slider
           value={power}
           min={50}
@@ -71,13 +73,14 @@ const App = () => {
           onChange={handleSliderChange(setPower)}
           valueLabelDisplay="auto"
           aria-labelledby="power-slider"
-          sx={{ flex: 2 }}
+          sx={{ flex: 2, ml: 1, mr: 1 }}
+          size="small"
         />
-        <Typography sx={{ flex: 1, textAlign: 'right' }}>{power}%</Typography>
+        <Typography sx={{ flex: 1, textAlign: 'right', fontSize: '12px' }}>{power}%</Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', mt: 3 }}>
-        <Typography sx={{ flex: 1, textAlign: 'center' }}>Significance level α:</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+        <Typography sx={{ flex: 1, textAlign: 'center', fontSize: '12px' }}>Significance level α:</Typography>
         <Slider
           value={significanceLevel}
           min={1}
@@ -86,9 +89,10 @@ const App = () => {
           onChange={handleSliderChange(setSignificanceLevel)}
           valueLabelDisplay="auto"
           aria-labelledby="significance-slider"
-          sx={{ flex: 2 }}
+          sx={{ flex: 2, ml: 1, mr: 1 }}
+          size="small"
         />
-        <Typography sx={{ flex: 1, textAlign: 'right' }}>{significanceLevel}%</Typography>
+        <Typography sx={{ flex: 1, textAlign: 'right', fontSize: '12px' }}>{significanceLevel}%</Typography>
       </Box>
     </Box>
   );
