@@ -5,7 +5,7 @@ import { calculateSampleSize } from './mathUtils';
 const App = () => {
   const [baselineRate, setBaselineRate] = useState(20);
   const [minDetectableEffect, setMinDetectableEffect] = useState(5);
-  const [option, setOption] = useState('Absolute');
+  const [isAbsolute, setIsAbsolute] = useState(true); // State variable for radio buttons
   const [sampleSize, setSampleSize] = useState('-');
   const [power, setPower] = useState(75);
   const [significanceLevel, setSignificanceLevel] = useState(5);
@@ -14,11 +14,11 @@ const App = () => {
     if (minDetectableEffect <= 0 || baselineRate <= 0 || minDetectableEffect > 9999 || baselineRate > 9999) {
       setSampleSize('-');
     } else {
-      const delta = option === 'Absolute' ? minDetectableEffect : baselineRate * (minDetectableEffect / 100);
-      const calculatedSampleSize = calculateSampleSize(baselineRate, delta, option, power, significanceLevel);
+      const delta = isAbsolute ? minDetectableEffect : baselineRate * (minDetectableEffect / 100);
+      const calculatedSampleSize = calculateSampleSize(baselineRate, delta, isAbsolute, power, significanceLevel);
       setSampleSize(Number.isFinite(calculatedSampleSize) ? Math.ceil(calculatedSampleSize) : '-');
     }
-  }, [baselineRate, minDetectableEffect, option, power, significanceLevel]);
+  }, [baselineRate, minDetectableEffect, isAbsolute, power, significanceLevel]);
 
   const handleSliderChange = (setter) => (event, value) => {
     setter(value);
@@ -34,8 +34,8 @@ const App = () => {
     }
   };
 
-  const handleOptionChange = (event) => {
-    setOption(event.target.value);
+  const handleRadioChange = (event) => {
+    setIsAbsolute(event.target.value === 'Absolute');
   };
 
   return (
@@ -68,7 +68,7 @@ const App = () => {
         inputProps={{ max: 9999, min: 0.01 }}
       />
 
-      <RadioGroup value={option} onChange={handleOptionChange} row>
+      <RadioGroup value={isAbsolute ? 'Absolute' : 'Relative'} onChange={handleRadioChange} row>
         <FormControlLabel value="Absolute" control={<Radio />} label="Absolute" />
         <FormControlLabel value="Relative" control={<Radio />} label="Relative" />
       </RadioGroup>
