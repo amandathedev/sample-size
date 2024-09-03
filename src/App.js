@@ -6,13 +6,18 @@ const App = () => {
   const [baselineRate, setBaselineRate] = useState(20);
   const [minDetectableEffect, setMinDetectableEffect] = useState(5);
   const [option, setOption] = useState('Absolute');
-  const [sampleSize, setSampleSize] = useState(0);
+  const [sampleSize, setSampleSize] = useState('-');
   const [power, setPower] = useState(75);
   const [significanceLevel, setSignificanceLevel] = useState(5);
 
   useEffect(() => {
-    const calculatedSampleSize = calculateSampleSize(baselineRate, minDetectableEffect, option, power, significanceLevel);
-    setSampleSize(calculatedSampleSize);
+    if (minDetectableEffect <= 0 || baselineRate <= 0 || minDetectableEffect > 9999 || baselineRate > 9999) {
+      setSampleSize('-');
+    } else {
+      const delta = option === 'Absolute' ? minDetectableEffect : baselineRate * (minDetectableEffect / 100);
+      const calculatedSampleSize = calculateSampleSize(baselineRate, delta, option, power, significanceLevel);
+      setSampleSize(Number.isFinite(calculatedSampleSize) ? Math.ceil(calculatedSampleSize) : '-');
+    }
   }, [baselineRate, minDetectableEffect, option, power, significanceLevel]);
 
   const handleSliderChange = (setter) => (event, value) => {
@@ -20,11 +25,12 @@ const App = () => {
   };
 
   const handleInputChange = (setter) => (event) => {
-    const value = event.target.value;
+    let value = event.target.value;
     if (value === '') {
-      setter(''); // Allow empty value
+      setter('');
     } else {
-      setter(parseFloat(value) || 0); // Only set as number if not empty
+      value = Math.min(parseFloat(value), 9999);
+      setter(parseFloat(value) || 0);
     }
   };
 
@@ -33,8 +39,14 @@ const App = () => {
   };
 
   return (
-    <Box className="App" sx={{ p: 3, width: '300px' }}>
-      <Typography gutterBottom>Sample size: {sampleSize} per variation</Typography>
+    <Box className="App" sx={{ p: 3, width: '260px' }}>
+      <Box sx={{ textAlign: 'center', mb: 2 }}>
+        <Typography variant="subtitle1">Sample Size</Typography>
+        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+          {sampleSize}
+        </Typography>
+        <Typography variant="body2">per variation</Typography>
+      </Box>
 
       <TextField
         label="Baseline conversion rate (%)"
@@ -43,7 +55,7 @@ const App = () => {
         onChange={handleInputChange(setBaselineRate)}
         fullWidth
         margin="normal"
-        inputProps={{ max: 100 }}
+        inputProps={{ max: 9999, min: 0.01 }}
       />
 
       <TextField
@@ -53,7 +65,7 @@ const App = () => {
         onChange={handleInputChange(setMinDetectableEffect)}
         fullWidth
         margin="normal"
-        inputProps={{ max: 100 }}
+        inputProps={{ max: 9999, min: 0.01 }}
       />
 
       <RadioGroup value={option} onChange={handleOptionChange} row>

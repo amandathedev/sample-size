@@ -79,4 +79,6 @@ After making changes, rebuild the project using `npm run build`, and then reload
 
 ### License:
 
+Created by [Amanda Treutler](www.amandatreutler.com) and [Evan Miller](https://www.evanmiller.org/)
+
 This project is licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
