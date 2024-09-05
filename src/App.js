@@ -20,14 +20,14 @@ const App = () => {
   }, [baselineRate, isAbsolute, power, significanceLevel, minDetectableEffect]);
 
   useEffect(() => {
-    const newSampleSizes = Array.from({ length: 20 }, (_, i) => {
+    const newSampleSizes = Array.from({ length: 100 }, (_, i) => {
       const mde = i + 1;
       const delta = isAbsolute ? mde : baselineRate * (mde / 100);
       const sampleSize = Math.max(calculateSampleSize(baselineRate, delta, isAbsolute, power, significanceLevel), 10);
       return { detectableEffect: mde, sampleSize };
     });
     setSampleSizes(newSampleSizes);
-  }, [baselineRate, isAbsolute, power, significanceLevel]);
+  }, [baselineRate, isAbsolute, power, significanceLevel]);  
 
   const handleSliderChange = (setter) => (event, value) => {
     setter(value);
@@ -54,8 +54,8 @@ const App = () => {
   if (isChartVisible) {
     return (
       <Box className="App" sx={{ p: 3, width: '560px' }}>
-        <EffectChart baselineRate={baselineRate} sampleSizes={sampleSizes} />
-        <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 3, mt: 3 }}>
+        <EffectChart baselineRate={baselineRate} sampleSizes={sampleSizes} isAbsolute={isAbsolute} />
+          <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 3, mt: 3 }}>
           <Box sx={{ display: 'grid', gridTemplateRows: 'auto auto', gap: 2 }}>
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
               <TextField

@@ -4,96 +4,97 @@ import { Chart as ChartJS, CategoryScale, LinearScale, LogarithmicScale, PointEl
 
 ChartJS.register(CategoryScale, LinearScale, LogarithmicScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const EffectChart = ({ baselineRate, sampleSizes }) => {
-  const labels = sampleSizes.map((item) => item.detectableEffect);
+const EffectChart = ({ baselineRate, sampleSizes, isAbsolute }) => {
+  // Only plot every 5th point for simplicity
+  const filteredSampleSizes = sampleSizes.filter((_, i) => i % 5 === 0);
 
+  const labels = filteredSampleSizes.map((item) => item.detectableEffect);
+
+  const options = {
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: `Sample Size for Baseline Rate ${baselineRate}%`,
+        font: {
+          size: 18,
+          weight: 'bold',
+        },
+      },
+      tooltip: {
+        callbacks: {
+          title: function (tooltipItems) {
+            const item = tooltipItems[0];
+            return `MDE: ${item.label}`;
+          },
+          label: function (tooltipItem) {
+            return `Sample Size: ${tooltipItem.raw.toLocaleString()}`;
+          },
+        },
+        displayColors: false,
+      },
+    },
+    scales: {
+      x: {
+        type: 'linear',
+        title: {
+          display: true,
+          text: 'Minimum Detectable Effect (%)',
+          font: {
+            size: 14,
+            weight: 'bold',
+          },
+        },
+        grid: {
+          color: 'rgba(200, 200, 200, 0.2)',
+        },
+        ticks: {
+          stepSize: 5, // Ensure ticks are divisible by 5
+        },
+        min: 0,
+        max: isAbsolute ? 90 : 100,  // 90 for absolute, 100 for relative
+      },
+      y: {
+        type: 'logarithmic',
+        grid: {
+          color: 'rgba(200, 200, 200, 0.2)',
+        },
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Sample Size',
+          font: {
+            size: 14,
+            weight: 'bold',
+          },
+        },
+      },
+    },
+  };
+  
+  
   const data = {
-    labels,
+    labels: sampleSizes.filter((_, i) => i % 5 === 0 || i === sampleSizes.length - 1).map(item => item.detectableEffect),  // Ensure 100% is included
     datasets: [
       {
         label: `Sample Size for Baseline Rate ${baselineRate}%`,
-        data: sampleSizes.map((item) => item.sampleSize),
+        data: sampleSizes.filter((_, i) => i % 5 === 0 || i === sampleSizes.length - 1).map(item => item.sampleSize),  // Ensure 100% is included
         fill: false,
         borderColor: '#1976d2',
         pointBackgroundColor: '#1976d2',
         pointBorderColor: '#1976d2',
         borderWidth: 2,
-        pointBorderWidth: 3,
-        pointRadius: 2,
-        pointShadowBlur: 5,
-        pointShadowColor: 'rgba(0, 0, 0, 0.3)',
-        tension: 0.1,
+        pointBorderWidth: 2,
+        pointRadius: 2,  // Small dots
+        tension: 0.5,
       },
     ],
   };
   
-
-const options = {
-  plugins: {
-    legend: {
-      display: false,
-    },
-    title: {
-      display: true,
-      text: `Sample Size for Baseline Rate ${baselineRate}%`,
-      font: {
-        size: 18,
-        weight: 'bold',
-      },
-    },
-    tooltip: {
-      callbacks: {
-        title: function (tooltipItems) {
-          const item = tooltipItems[0];
-          return `MDE: ${item.label}`;
-        },
-        label: function (tooltipItem) {
-          return `Sample Size: ${tooltipItem.raw.toLocaleString()}`;
-        },
-      },
-      displayColors: false,
-    },
-  },
-  scales: {
-    x: {
-      grid: {
-        color: 'rgba(200, 200, 200, 0.2)',
-      },
-      ticks: {
-        stepSize: 1,
-      },
-      title: {
-        display: true,
-        text: 'Minimum Detectable Effect (%)',
-        font: {
-          size: 14,
-          weight: 'bold',
-        },
-      },
-    },
-    y: {
-      type: 'logarithmic',
-      grid: {
-        color: 'rgba(200, 200, 200, 0.2)',
-      },
-      beginAtZero: true,
-      title: {
-        display: true,
-        text: 'Sample Size',
-        font: {
-          size: 14,
-          weight: 'bold',
-        },
-      },
-    },
-  },
-};
-
-  
-  
-  
-
   return <Line data={data} options={options} />;
+  
 };
 
 export default EffectChart;
