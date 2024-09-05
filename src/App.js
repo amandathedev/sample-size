@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Slider, Typography, Box, RadioGroup, FormControlLabel, Radio, TextField, Link } from '@mui/material';
+import { Typography, Box, RadioGroup, FormControlLabel, Radio, TextField, Button, Slider } from '@mui/material';
 import { calculateSampleSize } from './mathUtils';
+import EffectChart from './components/EffectChart';
 
 const App = () => {
   const [baselineRate, setBaselineRate] = useState(20);
-  const [minDetectableEffect, setMinDetectableEffect] = useState(5);
-  const [isAbsolute, setIsAbsolute] = useState(true);
+  const [isAbsolute, setIsAbsolute] = useState(false);
   const [sampleSize, setSampleSize] = useState('-');
-  const [power, setPower] = useState(75);
+  const [power, setPower] = useState(95);
   const [significanceLevel, setSignificanceLevel] = useState(5);
+  const [minDetectableEffect, setMinDetectableEffect] = useState(5);
+  const [isChartVisible, setIsChartVisible] = useState(false);
+  const [sampleSizes, setSampleSizes] = useState([]);
 
   useEffect(() => {
-    if (minDetectableEffect <= 0 || baselineRate <= 0 || minDetectableEffect > 9999 || baselineRate > 9999) {
-      setSampleSize('-');
-    } else {
-      const delta = isAbsolute ? minDetectableEffect : baselineRate * (minDetectableEffect / 100);
-      const calculatedSampleSize = calculateSampleSize(baselineRate, delta, isAbsolute, power, significanceLevel);
-      setSampleSize(Number.isFinite(calculatedSampleSize) ? Math.ceil(calculatedSampleSize) : '-');
-    }
-  }, [baselineRate, minDetectableEffect, isAbsolute, power, significanceLevel]);
+    const delta = isAbsolute ? minDetectableEffect : baselineRate * (minDetectableEffect / 100);
+    const calculatedSampleSize = calculateSampleSize(baselineRate, delta, isAbsolute, power, significanceLevel);
+    setSampleSize(Number.isFinite(calculatedSampleSize) ? Math.ceil(calculatedSampleSize) : '-');
+  }, [baselineRate, isAbsolute, power, significanceLevel, minDetectableEffect]);
+
+  useEffect(() => {
+    const newSampleSizes = Array.from({ length: 20 }, (_, i) => {
+      const mde = i + 1;
+      const delta = isAbsolute ? mde : baselineRate * (mde / 100);
+      const sampleSize = Math.max(calculateSampleSize(baselineRate, delta, isAbsolute, power, significanceLevel), 10);
+      return { detectableEffect: mde, sampleSize };
+    });
+    setSampleSizes(newSampleSizes);
+  }, [baselineRate, isAbsolute, power, significanceLevel]);
 
   const handleSliderChange = (setter) => (event, value) => {
     setter(value);
@@ -37,6 +46,71 @@ const App = () => {
   const handleRadioChange = (event) => {
     setIsAbsolute(event.target.value === 'Absolute');
   };
+
+  const handleToggleChart = () => {
+    setIsChartVisible(!isChartVisible);
+  };
+
+  if (isChartVisible) {
+    return (
+      <Box className="App" sx={{ p: 3, width: '560px' }}>
+        <EffectChart baselineRate={baselineRate} sampleSizes={sampleSizes} />
+        <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 3, mt: 3 }}>
+          <Box sx={{ display: 'grid', gridTemplateRows: 'auto auto', gap: 2 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              <TextField
+                label="Baseline (%)"
+                type="number"
+                value={baselineRate}
+                onChange={handleInputChange(setBaselineRate)}
+                size="small"
+                inputProps={{ max: 9999, min: 0.01 }}
+              />
+              <TextField
+                label="Power (%)"
+                type="number"
+                value={power}
+                onChange={handleInputChange(setPower)}
+                size="small"
+                inputProps={{ max: 99, min: 50 }}
+              />
+            </Box>
+
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              <Button
+                onClick={handleToggleChart}
+                variant="outlined"
+                fullWidth
+                sx={{ mt: 'auto', fontWeight: 'bold', borderWidth: '2px' }}
+              >
+                Back to Inputs
+              </Button>
+
+              <TextField
+                label="Significance (%)"
+                type="number"
+                value={significanceLevel}
+                onChange={handleInputChange(setSignificanceLevel)}
+                size="small"
+                inputProps={{ max: 10, min: 1 }}
+              />
+            </Box>
+          </Box>
+
+          <Box>
+            <RadioGroup
+              value={isAbsolute ? 'Absolute' : 'Relative'}
+              onChange={handleRadioChange}
+              sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+            >
+              <FormControlLabel value="Absolute" control={<Radio />} label="Absolute" />
+              <FormControlLabel value="Relative" control={<Radio />} label="Relative" />
+            </RadioGroup>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box className="App" sx={{ p: 3, width: '280px' }}>
@@ -68,10 +142,17 @@ const App = () => {
         inputProps={{ max: 9999, min: 0.01 }}
       />
 
-      <RadioGroup value={isAbsolute ? 'Absolute' : 'Relative'} onChange={handleRadioChange} row sx={{ justifyContent: 'center', mb: 2 }}>
-        <FormControlLabel value="Absolute" control={<Radio />} label="Absolute" />
-        <FormControlLabel value="Relative" control={<Radio />} label="Relative" />
-      </RadioGroup>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <RadioGroup
+          value={isAbsolute ? 'Absolute' : 'Relative'}
+          onChange={handleRadioChange}
+          row
+          sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
+        >
+          <FormControlLabel value="Absolute" control={<Radio />} label="Absolute" />
+          <FormControlLabel value="Relative" control={<Radio />} label="Relative" />
+        </RadioGroup>
+      </Box>
 
       <Box sx={{ mt: 3 }}>
         <Typography sx={{ mb: 1 }}>Statistical power 1−β:</Typography>
@@ -107,11 +188,9 @@ const App = () => {
         </Box>
       </Box>
 
-      <Box sx={{ textAlign: 'center', mt: 4 }}>
-        <Link href="https://www.evanmiller.org/ab-testing/" target="_blank" rel="noopener">
-          Explore more tools here
-        </Link>
-      </Box>
+      <Button onClick={handleToggleChart} variant="contained" fullWidth sx={{ mt: 3 }}>
+        View Chart
+      </Button>
     </Box>
   );
 };
