@@ -10,14 +10,21 @@ const App = () => {
   const [power, setPower] = useState(95);
   const [significanceLevel, setSignificanceLevel] = useState(5);
   const [minDetectableEffect, setMinDetectableEffect] = useState(5);
-  const [isChartVisible, setIsChartVisible] = useState(false);
+  const [isChartVisible, setIsChartVisible] = useState(true); // Set to true by default to show the chart first
   const [sampleSizes, setSampleSizes] = useState([]);
+  const [traffic, setTraffic] = useState(5000);
+  const [days, setDays] = useState(0);
 
   useEffect(() => {
     const delta = isAbsolute ? minDetectableEffect : baselineRate * (minDetectableEffect / 100);
     const calculatedSampleSize = calculateSampleSize(baselineRate, delta, isAbsolute, power, significanceLevel);
     setSampleSize(Number.isFinite(calculatedSampleSize) ? Math.ceil(calculatedSampleSize) : '-');
-  }, [baselineRate, isAbsolute, power, significanceLevel, minDetectableEffect]);
+
+    if (calculatedSampleSize) {
+      const calculatedDays = Math.ceil(calculatedSampleSize / traffic);
+      setDays(calculatedDays);
+    }
+  }, [baselineRate, isAbsolute, power, significanceLevel, minDetectableEffect, traffic]);
 
   useEffect(() => {
     const newSampleSizes = Array.from({ length: 100 }, (_, i) => {
@@ -27,7 +34,7 @@ const App = () => {
       return { detectableEffect: mde, sampleSize };
     });
     setSampleSizes(newSampleSizes);
-  }, [baselineRate, isAbsolute, power, significanceLevel]);  
+  }, [baselineRate, isAbsolute, power, significanceLevel]);
 
   const handleSliderChange = (setter) => (event, value) => {
     setter(value);
@@ -54,47 +61,48 @@ const App = () => {
   if (isChartVisible) {
     return (
       <Box className="App" sx={{ p: 3, width: '560px' }}>
-        <EffectChart baselineRate={baselineRate} sampleSizes={sampleSizes} isAbsolute={isAbsolute} />
-          <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 3, mt: 3 }}>
+        <EffectChart baselineRate={baselineRate} sampleSizes={sampleSizes} />
+
+        <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 3, mt: 3 }}>
           <Box sx={{ display: 'grid', gridTemplateRows: 'auto auto', gap: 2 }}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-              <TextField
-                label="Baseline (%)"
-                type="number"
-                value={baselineRate}
-                onChange={handleInputChange(setBaselineRate)}
-                size="small"
-                inputProps={{ max: 9999, min: 0.01 }}
-              />
-              <TextField
-                label="Power (%)"
-                type="number"
-                value={power}
-                onChange={handleInputChange(setPower)}
-                size="small"
-                inputProps={{ max: 99, min: 50 }}
-              />
-            </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            <TextField
+              label="Baseline (%)"
+              type="number"
+              value={baselineRate}
+              onChange={handleInputChange(setBaselineRate)}
+              size="small"
+              inputProps={{ max: 9999, min: 0.01 }}
+            />
+            <TextField
+              label="Power (%)"
+              type="number"
+              value={power}
+              onChange={handleInputChange(setPower)}
+              size="small"
+              inputProps={{ max: 99, min: 50 }}
+            />
+          </Box>
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-              <Button
-                onClick={handleToggleChart}
-                variant="outlined"
-                fullWidth
-                sx={{ mt: 'auto', fontWeight: 'bold', borderWidth: '2px' }}
-              >
-                Back to Inputs
-              </Button>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            <TextField
+              label="Traffic (Users per day)"
+              type="number"
+              value={traffic}
+              onChange={handleInputChange(setTraffic)}
+              size="small"
+              inputProps={{ max: 999999, min: 1 }}
+            />
+            <TextField
+              label="Significance (%)"
+              type="number"
+              value={significanceLevel}
+              onChange={handleInputChange(setSignificanceLevel)}
+              size="small"
+              inputProps={{ max: 10, min: 1 }}
+            />
+          </Box>
 
-              <TextField
-                label="Significance (%)"
-                type="number"
-                value={significanceLevel}
-                onChange={handleInputChange(setSignificanceLevel)}
-                size="small"
-                inputProps={{ max: 10, min: 1 }}
-              />
-            </Box>
           </Box>
 
           <Box>
@@ -108,6 +116,31 @@ const App = () => {
             </RadioGroup>
           </Box>
         </Box>
+
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          To detect a
+          <span style={{ fontWeight: 'bold', color: '#1976d2', marginLeft: '5px', marginRight: '5px' }}>{minDetectableEffect}%</span>
+          improvement from a
+          <span style={{ fontWeight: 'bold', color: '#1976d2', marginLeft: '5px', marginRight: '5px' }}>{baselineRate}%</span>
+          conversion rate, you'll need
+          <span style={{ fontWeight: 'bold', color: '#1976d2', marginLeft: '5px', marginRight: '5px' }}>{sampleSize.toLocaleString()}</span>
+          users per variation. Based on your current traffic of
+          <span style={{ fontWeight: 'bold', color: '#1976d2', marginLeft: '5px', marginRight: '5px' }}>{traffic.toLocaleString()}</span>
+          users per day, the experiment should run for
+          <span style={{ fontWeight: 'bold', color: '#1976d2', marginLeft: '5px', marginRight: '5px' }}>{days}</span>days.
+        </Typography>
+
+        <Box sx={{ mt: 3 }}>
+          <Button
+            onClick={handleToggleChart}
+            variant="contained"
+            fullWidth
+            sx={{ mt: 'auto', fontWeight: 'bold', borderWidth: '2px' }}
+          >
+            Go to Inputs
+          </Button>
+        </Box>
+
       </Box>
     );
   }
