@@ -40,12 +40,12 @@ const App = () => {
     setter(value);
   };
 
-  const handleInputChange = (setter) => (event) => {
+  const handleInputChange = (setter, max = 9999) => (event) => {
     let value = event.target.value;
     if (value === '') {
       setter('');
     } else {
-      value = Math.min(parseFloat(value), 9999);
+      value = Math.min(parseFloat(value), max);
       setter(parseFloat(value) || 0);
     }
   };
@@ -89,7 +89,7 @@ const App = () => {
               label="Traffic (Users per day)"
               type="number"
               value={traffic}
-              onChange={handleInputChange(setTraffic)}
+              onChange={handleInputChange(setTraffic, 999999)}
               size="small"
               inputProps={{ max: 999999, min: 1 }}
             />
